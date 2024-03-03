@@ -37,5 +37,5 @@ https://gist.github.com/hidsh/7065820
 
 https://www.geeksforgeeks.org/create-transparent-png-image-with-python-pillow/
 v
-
 https://scipython.com/blog/floyd-steinberg-dithering/
+
