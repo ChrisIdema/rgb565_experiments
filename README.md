@@ -39,3 +39,11 @@ https://www.geeksforgeeks.org/create-transparent-png-image-with-python-pillow/
 v
 https://scipython.com/blog/floyd-steinberg-dithering/
 
+colorbanding in rgb565 is worse than in rgb555 since white color lookse worse as some pixels are more green and others more purple
+one workaround could give change in color(ratio between colors) a higher penalty than change in brightness
+changing color format to HSV might be useful for this
+get closed color in terms of Hue and saturation and give lightness error a lower weight and maybe only use lightness for dither?
+or give green a higher weigth
+
+https://en.wikipedia.org/wiki/HSL_and_HSV
+https://math.hws.edu/graphicsbook/demos/c2/rgb-hsv.html
