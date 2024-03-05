@@ -49,38 +49,26 @@ def get_new_val(old_val, nc):
 
     if nc == 'rgb565':
         new_val = old_val
-        #works for reducing bitdepth:
-        # new_val[:,:,0] = np.round(old_val[:,:,0] * (32 - 1)*2) / (64 - 1)
-        # new_val[:,:,1] = np.round(old_val[:,:,1] * (64 - 1))   / (64 - 1)
-        # new_val[:,:,2] = np.round(old_val[:,:,2] * (32 - 1)*2) / (64 - 1)
 
-        # todo check math
-        new_val[0] = np.round(old_val[0] * (32 - 1))*2 / (64 - 1)
-        new_val[1] = np.round(old_val[1] * (64 - 1))   / (64 - 1)
-        new_val[2] = np.round(old_val[2] * (32 - 1))*2 / (64 - 1)
+        # print(len(new_val.shape))
 
+        if len(old_val.shape) ==  1:
+            # limit g to 62 to give g the same brightness range as r and b
+            new_val[0] = np.round(old_val[0] * (31))*2 / (62)
+            new_val[1] = np.round(old_val[1] * (62))   / (62)
+            new_val[2] = np.round(old_val[2] * (31))*2 / (62)
+
+        elif len(old_val.shape) ==  3:
+            # limit g to 62 to give g the same brightness range as r and b
+            new_val[:,:,0] = np.round(old_val[:,:,0] * (31))*2 / 62
+            new_val[:,:,1] = np.round(old_val[:,:,1] * (62))   / 62   
+            new_val[:,:,2] = np.round(old_val[:,:,2] * (31))*2 / 62
+        
         return new_val
 
     else:
-        # return np.round(old_val * (nc - 1)) / (nc - 1)
+        return np.round(old_val * (nc - 1)) / (nc - 1)
 
-        # p = np.linspace(0, 1, nc)    
-        # p = np.array(list(np.product(p,p,p)))
-
-
-
-        p = []
-        for r in range(4):
-            for g in range(8):
-                for b in range(4):
-                    p.append([r*2/7,g/7,b*2/7])
-
-        # print(p)
-
-        #p = np.array([[1,1,1],[0.5,0.5,0.5],[0,0,0],[1,0,0]])
-
-        idx = np.argmin(np.sum((old_val - p)**2, axis=1))
-        return p[idx]
 
 #For RGB images, the following might give better colour-matching.
 # p = np.linspace(0, 1, nc)
@@ -97,6 +85,7 @@ def fs_dither(img, nc):
     """
 
     arr = np.array(img, dtype=float) / 255
+    
 
     for ir in range(IMG_HEIGHT):
         for ic in range(IMG_WIDTH):
@@ -116,7 +105,16 @@ def fs_dither(img, nc):
                     arr[ir+1, ic+1] += err / 16
 
     # carr = np.array(arr/np.max(arr, axis=(0,1)) * 255, dtype=np.uint8)
-    carr = np.array(arr * 255, dtype=np.uint8)
+    # carr = np.array(arr * 255, dtype=np.uint8)
+                    
+    max = 255
+    if nc == 'rgb565':
+        max = 248
+                            
+    carr = np.array(arr * max, dtype=np.uint8)
+
+    # print(carr[0,0:20,:])
+    # print(carr[64,0:20,:])
     return Image.fromarray(carr)
 
 
@@ -125,7 +123,11 @@ def palette_reduce(img, nc):
     arr = np.array(img, dtype=float) / 255
     arr = get_new_val(arr, nc)
 
-    carr = np.array(arr/np.max(arr) * 255, dtype=np.uint8)
+    max = 255
+    if nc == 'rgb565':
+        max = 248
+
+    carr = np.array(arr/np.max(arr) * max, dtype=np.uint8)
     return Image.fromarray(carr)
 
 # rim = palette_reduce(img, 'rgb565')
@@ -133,9 +135,11 @@ def palette_reduce(img, nc):
 
 # for nc in (32,):
 # for nc in (2, 3, 4, 8, 16, 32):
-for nc in ('rgb565',): # (2, 3, 4, 8, 16):
+for nc in (4, 32, 'rgb565',): # (2, 3, 4, 8, 16):
     print('nc =', nc)
     dim = fs_dither(img, nc)
-    dim.save('dimg-{}.png'.format(nc))
-    #rim = palette_reduce(img, nc)
-    #rim.save('rimg-{}.png'.format(nc))
+    dim.save('img-{}-dither.png'.format(nc))
+    # rim = palette_reduce(img, nc)
+    # rim.save('img-{}-no-dither.png'.format(nc))
+
+
