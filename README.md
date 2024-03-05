@@ -16,7 +16,9 @@ In this implementation I've limited the range of green to 248, this gives green 
 In this implementation I will only use integer scaling to convert the values to 24-bit color. This reduces the maximum brightness for some palettes, but it prevents introducing new rounding errors. One way to somewhat compensate for this is to normalize the source image somewhat before applying dither if it pretty dark.
 Normalization is also called histogram/constrast stretching/equalization. Normalization can also significantly reduce quantization error if image is very low contrast.
 
-The output format is lossless png and colors are saved as rgb888. In order to convert it to binary you would need to convert/map the colors to the right bitformat (should be either integer division and bit shifting or mapping the colors to a palette index)
+If you don't mind rounding errors introduced by floating point scaling you might be able to make a better comparison to the original image on your computer screen in terms of maximum brightness (though color and relative brightness will be less correct). The resulting image will NOT work on the target hardware since it simply doesn't support those colors. On the target hardware the lowest significant bits are probably masked and if no analog compensation is applied the image will look less bright than in RGB888 mode.
+
+The output format is lossless png and colors are saved as rgb888. In order to convert it to binary you would need to convert/map the colors to the right bit format (should be either integer division and bit shifting or mapping the colors to a palette index)
 
 
 # Links
