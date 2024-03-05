@@ -16,6 +16,8 @@ In this implementation I've limited the range of green to 248, this gives green 
 In this implementation I will only use integer scaling to convert the values to 24-bit color. This reduces the maximum brightness for some palettes, but it prevents introducing new rounding errors. One way to somewhat compensate for this is to normalize the source image somewhat before applying dither if it pretty dark.
 Normalization is also called histogram/constrast stretching/equalization. Normalization can also significantly reduce quantization error if image is very low contrast.
 
+The output format is lossless png and colors are saved as rgb888. In order to convert it to binary you would need to convert/map the colors to the right bitformat (should be either integer division and bit shifting or mapping the colors to a palette index)
+
 
 # Links
 - https://en.wikipedia.org/wiki/List_of_monochrome_and_RGB_color_formats#16-bit_RGB_(also_known_as_RGB565)
@@ -36,3 +38,5 @@ Normalization is also called histogram/constrast stretching/equalization. Normal
 * test if cost function works better if image is in HSV mode
 * Gimp plugin
 * inkscape plugin
+* C/C++ version (maybe even constexpr)
+
