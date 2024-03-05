@@ -48,7 +48,7 @@ def get_new_val(old_val, nc):
     """
 
     if nc == 'rgb565':
-        new_val = old_val
+        new_val = old_val.copy()
 
         # print(len(new_val.shape))
 
@@ -76,6 +76,14 @@ def get_new_val(old_val, nc):
 # def get_new_val(old_val):
 #    idx = np.argmin(np.sum((old_val[None,:] - p)**2, axis=1))
 #    return p[idx]
+    
+def color_range_max(nc):
+    if nc == 'rgb565':
+        # limit g to 62 to give g the same brightness range as r and b
+        max = 248
+    else:
+        max = (nc-1)*(256/nc)
+    return max
 
 def fs_dither(img, nc):
     """
@@ -84,7 +92,8 @@ def fs_dither(img, nc):
 
     """
 
-    arr = np.array(img, dtype=float) / 255
+    arr_raw = np.array(img, dtype=np.single)
+    arr = np.array(img, dtype=np.single) / 255
     
 
     for ir in range(IMG_HEIGHT):
@@ -104,12 +113,10 @@ def fs_dither(img, nc):
                 if ic < IMG_WIDTH - 1:
                     arr[ir+1, ic+1] += err / 16
 
-    # carr = np.array(arr/np.max(arr, axis=(0,1)) * 255, dtype=np.uint8)
-    # carr = np.array(arr * 255, dtype=np.uint8)
+    # carr = np.array(arr/np.max(arr, axis=(0,1)) * 255, dtype=np.uint8) # if possible increase dynamic range, then map to 0-255 (may not be integer multuple)
+    # carr = np.array(arr * 255, dtype=np.uint8) # map to 0-255 (may not be integer multuple)
                     
-    max = 255
-    if nc == 'rgb565':
-        max = 248
+    max = color_range_max(nc) # map to 0-max (is always integer multiple of nc)
                             
     carr = np.array(arr * max, dtype=np.uint8)
 
@@ -120,12 +127,10 @@ def fs_dither(img, nc):
 
 def palette_reduce(img, nc):
     """Simple palette reduction without dithering."""
-    arr = np.array(img, dtype=float) / 255
+    arr = np.array(img, dtype=np.single) / 255
     arr = get_new_val(arr, nc)
 
-    max = 255
-    if nc == 'rgb565':
-        max = 248
+    max = max = color_range_max(nc)
 
     carr = np.array(arr/np.max(arr) * max, dtype=np.uint8)
     return Image.fromarray(carr)
@@ -135,11 +140,11 @@ def palette_reduce(img, nc):
 
 # for nc in (32,):
 # for nc in (2, 3, 4, 8, 16, 32):
-for nc in (4, 32, 'rgb565',): # (2, 3, 4, 8, 16):
+for nc in ('rgb565',): # (2, 3, 4, 8, 16):
     print('nc =', nc)
     dim = fs_dither(img, nc)
-    dim.save('img-{}-dither.png'.format(nc))
-    # rim = palette_reduce(img, nc)
-    # rim.save('img-{}-no-dither.png'.format(nc))
+    dim.save('img_{}_dither.png'.format(nc))
+    rim = palette_reduce(img, nc)
+    rim.save('img_{}_no_dither.png'.format(nc))
 
 

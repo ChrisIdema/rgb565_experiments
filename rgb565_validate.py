@@ -14,7 +14,7 @@ def validate(arr):
     return np.all(arr&[2**(8-5)-1, 2**(8-6)-1, 2**(8-5)-1]==[0,0,0]) 
 
 
-img_names = ['rgb888.png','rgb565_no_dither.png',]
+img_names = ['rgb888.png','rgb565_no_dither.png','img_32_no_dither.png','img_32_dither.png','img_rgb565_no_dither.png','img_rgb565_dither.png',]
 
 for img_name in img_names:
     img = Image.open(img_name)
