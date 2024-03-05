@@ -18,7 +18,7 @@ img.save("rgb888.png", "PNG")
 # a[:,:,1] = np.uint8(a[:,:,1]*(63.0/255.0))*4
 # a[:,:,2] = np.uint8(a[:,:,2]*(31.0/255.0))*8
 
-# limit g to 62 to give g the same brightness range as r and b
+# limit g to 62 to give g the same brightness range as r and b (superset of r and b possible values)
 a[:,:,0] = np.round(a[:,:,0]/255 * (31))*8
 a[:,:,1] = np.round(a[:,:,1]/255 * (62))*4   
 a[:,:,2] = np.round(a[:,:,2]/255 * (31))*8
