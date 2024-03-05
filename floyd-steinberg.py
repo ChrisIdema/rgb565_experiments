@@ -1,4 +1,4 @@
-#https://scipython.com/blog/floyd-steinberg-dithering/
+# based on https://scipython.com/blog/floyd-steinberg-dithering/
 import numpy as np
 from PIL import Image
 
@@ -48,21 +48,15 @@ def get_new_val(old_val, nc):
     """
 
     if nc == 'rgb565':
-        new_val = old_val.copy()
+        # https://numpy.org/doc/stable/reference/generated/numpy.empty_like.html
+        new_val = np.empty_like(old_val)
 
-        # print(len(new_val.shape))
+        # https://stackoverflow.com/questions/12116830/numpy-slice-of-arbitrary-dimensions
 
-        if len(old_val.shape) ==  1:
-            # limit g to 62 to give g the same brightness range as r and b
-            new_val[0] = np.round(old_val[0] * (31))*2 / (62)
-            new_val[1] = np.round(old_val[1] * (62))   / (62)
-            new_val[2] = np.round(old_val[2] * (31))*2 / (62)
-
-        elif len(old_val.shape) ==  3:
-            # limit g to 62 to give g the same brightness range as r and b
-            new_val[:,:,0] = np.round(old_val[:,:,0] * (31))*2 / 62
-            new_val[:,:,1] = np.round(old_val[:,:,1] * (62))   / 62   
-            new_val[:,:,2] = np.round(old_val[:,:,2] * (31))*2 / 62
+        # limit g to 62 to give g the same brightness range as r and b
+        new_val[...,0] = np.round(old_val[...,0] * (31))*2 / 62
+        new_val[...,1] = np.round(old_val[...,1] * (62))   / 62   
+        new_val[...,2] = np.round(old_val[...,2] * (31))*2 / 62
         
         return new_val
 
