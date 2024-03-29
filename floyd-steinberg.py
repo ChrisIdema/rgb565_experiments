@@ -49,7 +49,21 @@ def fs_dither(img, nc):
 
     """
 
-    arr = np.array(img, dtype=np.single) / 255
+    # scale brightness if needed
+    palette_max = color_range_max(nc)
+    arr = np.array(img, dtype=np.single)
+    img_max = arr.max()
+    if img_max > palette_max:
+        #scale brightness:
+        arr = arr / img_max
+
+        #clip brightness
+        #arr = arr / palette_max
+        #arr = np.clip(arr, 0, 1)
+    else:
+        #1:1
+        arr = arr / palette_max
+
     
     IMG_HEIGHT = arr.shape[0]
     IMG_WIDTH  = arr.shape[1]
@@ -72,24 +86,38 @@ def fs_dither(img, nc):
                     arr[ir+1, ic+1] += err / 16
 
     # carr = np.array(arr/np.max(arr, axis=(0,1)) * 255, dtype=np.uint8) # increase dynamic range if possible, then map to 0-255 (may not be integer multiple)
-    # carr = np.array(arr * 255, dtype=np.uint8) # map to 0-255 (may not be integer multiple of nc)                            
-    carr = np.array(arr * color_range_max(nc), dtype=np.uint8) # map to 0-max_of_nc (is always integer multiple of nc)   
+    # carr = np.array(arr * 255, dtype=np.uint8) # map to 0-255 (may not be integer multiple of nc-1)                            
+    carr = np.array(arr * palette_max, dtype=np.uint8) # map to 0-max_of_nc (is always integer multiple of nc-1)   
 
     return Image.fromarray(carr)
 
 
 def palette_reduce(img, nc):
     """Simple palette reduction without dithering."""
-    arr = np.array(img, dtype=np.single) / 255
 
+    # scale brightness if needed
+    palette_max = color_range_max(nc)
+    arr = np.array(img, dtype=np.single)
+    img_max = arr.max()
+    if img_max > palette_max:
+        #scale brightness:
+        arr = arr / img_max
+
+        #clip brightness
+        #arr = arr / palette_max
+        #arr = np.clip(arr, 0, 1)
+    else:
+        #1:1
+        arr = arr / palette_max
+
+    
     # # increase dynamic range:
     # arr = np.clip(arr * 2 - 0.10, 0, 1)
 
     arr = get_new_val(arr, nc)
 
-    max = color_range_max(nc)
 
-    carr = np.array(arr * max, dtype=np.uint8)
+    carr = np.array(arr * palette_max, dtype=np.uint8)
     return Image.fromarray(carr)
 
 
